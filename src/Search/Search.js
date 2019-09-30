@@ -3,6 +3,33 @@ import { withStyles } from '@material-ui/core/styles';
 import { CardMedia, Grid, Typography, Paper, IconButton, InputBase } from '@material-ui/core';
 import { Search as SearchIcon } from '@material-ui/icons';
 
+const styles = theme => ({
+  CardMedia: {
+    width: '35%',
+    height: 165
+  },
+  Typography: {
+    textAlign: 'center',
+    fontSize: '32px'
+  },
+  Paper: {
+    padding: '2px 4px',
+    display: 'flex',
+    alignItems: 'center',
+    width: 400,
+  },
+  input: {
+    marginLeft: theme.spacing(1),
+    flex: 1,
+  },
+  iconButton: {
+    padding: 10,
+  },
+  GridPaper: {
+    padding: 25,
+  }
+})
+
 const Search = ({ classes }) => {
   return (
     <div className="Search">
@@ -30,4 +57,4 @@ const Search = ({ classes }) => {
   )
 }
 
-export default Search
+export default withStyles(styles)(Search)
