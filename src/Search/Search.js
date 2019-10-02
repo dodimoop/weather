@@ -1,39 +1,14 @@
-import React, { Component } from 'react';
-import { CardMedia, Grid, Typography, Paper, IconButton, InputBase } from '@material-ui/core';
+import React, { useState } from 'react';
+import { CardMedia, Grid, Typography, Paper, IconButton, InputBase, Divider } from '@material-ui/core';
 import { Search as SearchIcon } from '@material-ui/icons';
 
-class Search extends Component {
+const Search = () => {
 
-  state = {
-    currentInput: ''
-  }
+    const [getCountry, setCountry] = useState(null)
 
-  async componentDidMount() {
-    await this.resetAllSearch()
-  }
-
-  onInputHandler = async (e) => {
-    let inputText = e.target.value
-    console.log(inputText);
-    await this.setState({currentInput: inputText})
-
-    if(this.state.currentInput.length < 1) {
-      this.resetAllSearch()
+    const buttonHandler = () => {
+      alert(getCountry)
     }
-  }
-
-  ButtonHandle = async () => {
-    let { currentInput } = this.state
-    
-    alert(currentInput)
-
-  }
-
-  resetAllSearch = async () => {
-    this.setState({currentInput: ''})
-  }
-
-  render() {
 
     return (
       <div className="Search">
@@ -47,23 +22,35 @@ class Search extends Component {
           WEATHER APP
         </Typography>
         <Grid container justify="center" style={{padding: '25px'}}>
-          <Paper style={{padding: '4px 12px', display: 'flex', alignItems: 'center', width: '18%', borderBottom: '2px solid #eee' }}>
+          <Paper style={{padding: '4px 12px', display: 'flex', alignItems: 'center', width: '45%', borderBottom: '2px solid #eee' }}>
             <InputBase
-              placeholder="Search Country or City"
-              onInput={this.onInputHandler}
+              placeholder="Input Country or City"
+              onChange={(e) => setCountry(e.target.value)}
+            />
+            <Divider style={{height: '28px', margin: '4px'}} orientation="vertical" />
+            <InputBase
+              placeholder="Input latitude"
+            />
+            <Divider style={{height: '28px', margin: '4px'}} orientation="vertical" />
+            <InputBase
+              placeholder="Input Longitude"
             />
             <IconButton 
               style={{padding: '10px'}} 
               aria-label="search"
-              onClick={() => this.ButtonHandle()}>
+              onClick={() => buttonHandler()}
+              >
               <SearchIcon />
             </IconButton>
           </Paper>
         </Grid>
+        <Grid container justify="center">
+          <p style={{textAlign: 'center', fontSize: '32px'}}>
+            Your Country {getCountry}
+          </p>
+        </Grid>
       </div>  
     ) 
   }
-
-}
 
 export default Search
