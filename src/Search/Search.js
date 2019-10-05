@@ -1,14 +1,42 @@
-import React, { useState } from 'react';
-import { CardMedia, Grid, Typography, Paper, IconButton, InputBase, Divider } from '@material-ui/core';
-import { Search as SearchIcon } from '@material-ui/icons';
+import React, { useState, useEffect } from 'react'
+import { CardMedia, Grid, Typography, Paper, InputBase, Divider } from '@material-ui/core'
+import { debounce } from 'lodash'
+import axios from 'axios'
 
 const Search = () => {
-
-    const [getCountry, setCountry] = useState(null)
-
-    const buttonHandler = () => {
-      alert(getCountry)
+    // State and setState handle
+    const [country, setCountry] = useState('')
+    const [latitude, setLatitude] = useState('')
+    const [longitude, setLongitude] = useState('')
+    const [location, setLocation] = useState('')
+    // Input Handle
+    const changeEvent = debounce(setCountry, 3000)
+    const onChangeCountry = event => {
+      changeEvent(event.target.value)
     }
+
+    // Using useEffect
+    useEffect(() => {
+      const fetchGeocode = async () => {
+        try {
+          const { data } = await axios.get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + country + '.json?access_token=pk.eyJ1IjoiZG9keXNldGl5YXdhbiIsImEiOiJjazBhMHY4MjEwZTBqM2JtbmNydDJscHF2In0.B8RU60OZ4gWlozeMUYwOFQ&limit=1')
+          const latitude = data.features[0].center[1]
+          setLatitude(latitude)
+          const longitude = data.features[0].center[0]
+          setLongitude(longitude)
+          const location = data.features[0].place_name
+          setLocation(location)
+          
+          const responseForecast = await axios.get('https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/68bd01685b3267ec09cb6cae192dcf5d/' + latitude +','+ longitude + '?lang=en')
+          console.log(responseForecast)
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      if (country !== '') {
+        fetchGeocode()
+      }
+    }, [country])
 
     return (
       <div className="Search">
@@ -25,28 +53,25 @@ const Search = () => {
           <Paper style={{padding: '4px 12px', display: 'flex', alignItems: 'center', width: '45%', borderBottom: '2px solid #eee' }}>
             <InputBase
               placeholder="Input Country or City"
-              onChange={(e) => setCountry(e.target.value)}
+              onChange={onChangeCountry}
             />
             <Divider style={{height: '28px', margin: '4px'}} orientation="vertical" />
             <InputBase
               placeholder="Input latitude"
+              value={latitude}
+              disabled
             />
             <Divider style={{height: '28px', margin: '4px'}} orientation="vertical" />
             <InputBase
               placeholder="Input Longitude"
+              value={longitude}
+              disabled
             />
-            <IconButton 
-              style={{padding: '10px'}} 
-              aria-label="search"
-              onClick={() => buttonHandler()}
-              >
-              <SearchIcon />
-            </IconButton>
           </Paper>
         </Grid>
         <Grid container justify="center">
           <p style={{textAlign: 'center', fontSize: '32px'}}>
-            Your Country {getCountry}
+            Your Location: {location}
           </p>
         </Grid>
       </div>  
