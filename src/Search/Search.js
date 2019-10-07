@@ -1,14 +1,47 @@
 import React, { useState, useEffect } from 'react'
 import { CardMedia, Grid, Typography, Paper, InputBase, Divider } from '@material-ui/core'
+import { withStyles } from '@material-ui/core/styles'
 import { debounce } from 'lodash'
 import axios from 'axios'
 
-const Search = () => {
+const styles = theme => ({
+  CardMedia: {
+    width: '35%',
+    height: '165px'
+  },
+  Typography: {
+    textAlign: 'center',
+    fontSize: '32px'
+  },
+  Paper: {
+    padding: '4px 12px', 
+    display: 'flex', 
+    alignItems: 'center', 
+    width: '45%', 
+    borderBottom: '2px solid #eee'
+  },
+  Divider: {
+    height: '28px', 
+    margin: '4px'
+  },
+  GridParagraph: {
+    textAlign: 'center', 
+    fontSize: '28px', 
+    margin: '0 0 0 0'
+  },
+  GridParagraphSummary: {
+    textAlign: 'center', 
+    fontSize: '18px'
+  }
+})
+
+const Search = ({ classes }) => {
     // State and setState handle
     const [country, setCountry] = useState('')
     const [latitude, setLatitude] = useState('')
     const [longitude, setLongitude] = useState('')
     const [location, setLocation] = useState('')
+    const [summary, setSummary] = useState('')
     // Input Handle
     const changeEvent = debounce(setCountry, 3000)
     const onChangeCountry = event => {
@@ -27,8 +60,9 @@ const Search = () => {
           const location = data.features[0].place_name
           setLocation(location)
           
-          const responseForecast = await axios.get('https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/68bd01685b3267ec09cb6cae192dcf5d/' + latitude +','+ longitude + '?lang=en')
-          console.log(responseForecast)
+          const resultForecast = await axios.get('https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/68bd01685b3267ec09cb6cae192dcf5d/' + latitude +','+ longitude + '?lang=id')
+          const summaryResult = resultForecast.data.daily.summary + ' Saat ini ' + resultForecast.data.currently.temperature + ' derajat keluar. Ada sebuah ' + resultForecast.data.currently.precipProbability + '% kemungkinan hujan.'
+          setSummary(summaryResult)
         } catch (error) {
           console.log(error);
         }
@@ -42,40 +76,45 @@ const Search = () => {
       <div className="Search">
         <Grid container justify="center" alignItems="center">
           <CardMedia
-            style={{width: '35%', height: '165px'}} 
+            className={classes.CardMedia}
             image="http://www.pngall.com/wp-content/uploads/2017/01/Weather-Report-Free-Download-PNG.png"
           />
         </Grid>
-        <Typography style={{textAlign: 'center', fontSize: '32px'}} letterSpacing={6}>
-          WEATHER APP
+        <Typography className={classes.Typography} letterSpacing={6}>
+          WEATHER APP °
         </Typography>
         <Grid container justify="center" style={{padding: '25px'}}>
-          <Paper style={{padding: '4px 12px', display: 'flex', alignItems: 'center', width: '45%', borderBottom: '2px solid #eee' }}>
+          <Paper className={classes.Paper}>
             <InputBase
               placeholder="Input Country or City"
               onChange={onChangeCountry}
             />
-            <Divider style={{height: '28px', margin: '4px'}} orientation="vertical" />
+            <Divider className={classes.Divider} orientation="vertical" />
             <InputBase
-              placeholder="Input latitude"
+              placeholder="latitude"
               value={latitude}
               disabled
             />
-            <Divider style={{height: '28px', margin: '4px'}} orientation="vertical" />
+            <Divider className={classes.Divider} orientation="vertical" />
             <InputBase
-              placeholder="Input Longitude"
+              placeholder="Longitude"
               value={longitude}
               disabled
             />
           </Paper>
         </Grid>
         <Grid container justify="center">
-          <p style={{textAlign: 'center', fontSize: '32px'}}>
-            Your Location: {location}
+          <p className={classes.GridParagraph} >
+            {location}
+          </p>
+        </Grid>
+        <Grid container justify="center">
+          <p className={classes.GridParagraphSummary}>
+            Summary: {summary}
           </p>
         </Grid>
       </div>  
     ) 
   }
 
-export default Search
+export default withStyles(styles)(Search)
