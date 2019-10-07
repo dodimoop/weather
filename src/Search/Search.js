@@ -110,7 +110,7 @@ const Search = ({ classes }) => {
         </Grid>
         <Grid container justify="center">
           <p className={classes.GridParagraphSummary}>
-            Summary: {summary}
+            {summary}
           </p>
         </Grid>
       </div>  
