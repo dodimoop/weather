@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { CardMedia, Grid, Typography, Paper, InputBase, Divider } from '@material-ui/core'
+import { CardMedia, Grid, Typography, Paper, InputBase, Divider, CircularProgress } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import { debounce } from 'lodash'
 import axios from 'axios'
@@ -42,6 +42,8 @@ const Search = ({ classes }) => {
     const [longitude, setLongitude] = useState('')
     const [location, setLocation] = useState('')
     const [summary, setSummary] = useState('')
+    const [loading, setLoading] = useState(false)
+
     // Input Handle
     const changeEvent = debounce(setCountry, 3000)
     const onChangeCountry = event => {
@@ -52,6 +54,7 @@ const Search = ({ classes }) => {
     useEffect(() => {
       const fetchGeocode = async () => {
         try {
+          setLoading(true)
           const { data } = await axios.get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + country + '.json?access_token=pk.eyJ1IjoiZG9keXNldGl5YXdhbiIsImEiOiJjazBhMHY4MjEwZTBqM2JtbmNydDJscHF2In0.B8RU60OZ4gWlozeMUYwOFQ&limit=1')
           const latitude = data.features[0].center[1]
           setLatitude(latitude)
@@ -63,8 +66,11 @@ const Search = ({ classes }) => {
           const resultForecast = await axios.get('https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/68bd01685b3267ec09cb6cae192dcf5d/' + latitude +','+ longitude + '?lang=id')
           const summaryResult = resultForecast.data.daily.summary + ' Saat ini ' + resultForecast.data.currently.temperature + ' derajat keluar. Ada sebuah ' + resultForecast.data.currently.precipProbability + '% kemungkinan hujan.'
           setSummary(summaryResult)
+          
         } catch (error) {
           console.log(error);
+        } finally {
+          setLoading(false)
         }
       }
       if (country !== '') {
@@ -103,16 +109,20 @@ const Search = ({ classes }) => {
             />
           </Paper>
         </Grid>
-        <Grid container justify="center">
-          <p className={classes.GridParagraph} >
-            {location}
-          </p>
-        </Grid>
-        <Grid container justify="center">
-          <p className={classes.GridParagraphSummary}>
-            {summary}
-          </p>
-        </Grid>
+        {loading ? (
+          <Grid container justify="center">
+            <CircularProgress color="secondary" />
+          </Grid>
+        ) : (
+          <div>
+            <Grid container justify="center">
+              <p className={classes.GridParagraph}>{location}</p>
+            </Grid>
+            <Grid container justify="center">
+              <p className={classes.GridParagraphSummary}>{summary}</p>
+            </Grid>
+          </div>
+        )}
       </div>  
     ) 
   }
