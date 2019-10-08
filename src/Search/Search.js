@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import { CardMedia, Grid, Typography, Paper, InputBase, Divider, CircularProgress } from '@material-ui/core'
+import { 
+  CardMedia, 
+  Grid, 
+  Typography, 
+  Paper, 
+  InputBase, 
+  Divider, 
+  CircularProgress, 
+  ExpansionPanel,
+  ExpansionPanelSummary,
+  ExpansionPanelDetails
+ } from '@material-ui/core'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { withStyles } from '@material-ui/core/styles'
 import { debounce } from 'lodash'
 import axios from 'axios'
@@ -11,7 +23,12 @@ const styles = theme => ({
   },
   Typography: {
     textAlign: 'center',
-    fontSize: '32px'
+    fontSize: '32px',
+    letterSpacing: 4,
+    color: '#585858'
+  },
+  Grid: {
+    padding: '25px'
   },
   Paper: {
     padding: '4px 12px', 
@@ -32,6 +49,25 @@ const styles = theme => ({
   GridParagraphSummary: {
     textAlign: 'center', 
     fontSize: '18px'
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular,
+  },
+  ExpansionPanelSummary: {
+    height: 75,
+    background: '#F1F1F1',
+    borderBottom: '3px solid #e4e4e4',
+
+  },
+  ExpansionPanelDetails: {
+    display: 'flex',
+    padding: '8px 24px 24px',
+    height: '50px',
+    background: '#e4e4e4',
+  },
+  divExpansion: {
+    margin: 25
   }
 })
 
@@ -43,9 +79,10 @@ const Search = ({ classes }) => {
     const [location, setLocation] = useState('')
     const [summary, setSummary] = useState('')
     const [loading, setLoading] = useState(false)
+    const [data,setData] = useState([])
 
     // Input Handle
-    const changeEvent = debounce(setCountry, 3000)
+    const changeEvent = debounce(setCountry, 2000)
     const onChangeCountry = event => {
       changeEvent(event.target.value)
     }
@@ -63,12 +100,14 @@ const Search = ({ classes }) => {
           const location = data.features[0].place_name
           setLocation(location)
           
-          const resultForecast = await axios.get('https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/68bd01685b3267ec09cb6cae192dcf5d/' + latitude +','+ longitude + '?lang=id')
-          const summaryResult = resultForecast.data.daily.summary + ' Saat ini ' + resultForecast.data.currently.temperature + ' derajat keluar. Ada sebuah ' + resultForecast.data.currently.precipProbability + '% kemungkinan hujan.'
+          const response = await axios.get('https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/68bd01685b3267ec09cb6cae192dcf5d/' + latitude +','+ longitude + '?lang=id')
+          const dataDaily = await response.data.daily.data
+          setData(dataDaily)
+          const summaryResult = response.data.daily.summary + ' Saat ini ' + response.data.currently.temperature + ' derajat keluar. Ada sebuah ' + response.data.currently.precipProbability + '% kemungkinan hujan.'
           setSummary(summaryResult)
           
         } catch (error) {
-          console.log(error);
+          console.log(error)
         } finally {
           setLoading(false)
         }
@@ -86,10 +125,10 @@ const Search = ({ classes }) => {
             image="http://www.pngall.com/wp-content/uploads/2017/01/Weather-Report-Free-Download-PNG.png"
           />
         </Grid>
-        <Typography className={classes.Typography} letterSpacing={6}>
-          WEATHER APP °
+        <Typography className={classes.Typography}>
+          WEATHER 
         </Typography>
-        <Grid container justify="center" style={{padding: '25px'}}>
+        <Grid container justify="center" className={classes.Grid}>
           <Paper className={classes.Paper}>
             <InputBase
               placeholder="Input Country or City"
@@ -123,6 +162,29 @@ const Search = ({ classes }) => {
             </Grid>
           </div>
         )}
+        {data.map((data, index) => (
+          <div className={classes.divExpansion} key={index}>
+            <Grid container justify="center">
+              <ExpansionPanel>
+                <ExpansionPanelSummary
+                  className={classes.ExpansionPanelSummary}
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls={data.time}
+                  id={data.time}
+                >
+                  <Typography className={classes.heading}>{data.icon}</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails className={classes.ExpansionPanelDetails}>
+                  <Typography>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+                    sit amet blandit leo lobortis eget.
+                  </Typography>
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+            </Grid>
+          </div>
+        ))}
+
       </div>  
     ) 
   }
