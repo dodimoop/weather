@@ -68,6 +68,9 @@ const styles = theme => ({
   },
   divExpansion: {
     margin: 25
+  },
+  ExpansionPanel: {
+    width: '70%'
   }
 })
 
@@ -165,7 +168,7 @@ const Search = ({ classes }) => {
         {data.map((data, index) => (
           <div className={classes.divExpansion} key={index}>
             <Grid container justify="center">
-              <ExpansionPanel>
+              <ExpansionPanel className={classes.ExpansionPanel}>
                 <ExpansionPanelSummary
                   className={classes.ExpansionPanelSummary}
                   expandIcon={<ExpandMoreIcon />}
@@ -176,8 +179,7 @@ const Search = ({ classes }) => {
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={classes.ExpansionPanelDetails}>
                   <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                    sit amet blandit leo lobortis eget.
+                    {data.summary}
                   </Typography>
                 </ExpansionPanelDetails>
               </ExpansionPanel>
